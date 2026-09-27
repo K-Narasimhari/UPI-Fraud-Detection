@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Money | UPI Fraud Detection System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'electric-indigo': '#6366f1',
+                        'cyber-rose': '#ff2d55',
+                        'emerald-safe': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .pin-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pin-dot.filled {
+            background-color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue-glow);
+            transform: scale(1.3);
+        }
+
+        .numpad-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s;
+        }
+
+        .numpad-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .numpad-btn:active {
+            background: var(--neon-blue);
+            color: var(--obsidian);
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 bg-obsidian relative">
+
+    <!-- Background circuit effect -->
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="grid-txn" width="80" height="80" patternUnits="userSpaceOnUse">
+                    <circle cx="1" cy="1" r="1" fill="#6366f1" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-txn)" />
+        </svg>
+    </div>
+
+    <div class="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] bg-electric-indigo/10 rounded-full blur-[120px]">
+    </div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-neon-blue/10 rounded-full blur-[100px]"></div>
+
+    <div class="max-w-md w-full z-10">
+        <!-- Logo/Header -->
+        <div class="text-center mb-10">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-neon-blue to-electric-indigo rounded-2xl mb-6 shadow-2xl relative group">
+                <i class="fas fa-paper-plane text-obsidian text-2xl group-hover:scale-110 transition-transform"></i>
+                <div
+                    class="absolute -inset-2 bg-neon-blue/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                </div>
+            </div>
+            <h1 class="text-4xl font-black text-white tracking-tight">Egress Gateway</h1>
+            <p class="text-slate-500 font-bold mt-2 uppercase tracking-[0.2em] text-[10px]">Real-Time Transfer
+                Validation</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-8 space-y-4">
+            {% for category, message in messages %}
+            <div
+                class="p-5 rounded-2xl flex items-center space-x-4 glass shadow-2xl {{ 'bg-cyber-rose/10 text-cyber-rose border-cyber-rose/20' if category == 'danger' else 'bg-neon-blue/10 text-neon-blue border-neon-blue/20' }}">
+                <i
+                    class="fas {{ 'fa-exclamation-triangle' if category == 'danger' else 'fa-info-circle' }} text-xl"></i>
+                <p class="text-sm font-black uppercase tracking-wide">{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Transaction Form -->
+        <div
+            class="glass-card p-10 rounded-[3rem] shadow-3xl border border-white/5 relative overflow-hidden bg-white/5">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue to-electric-indigo"></div>
+
+            <div class="mb-8 p-6 bg-black/40 rounded-3xl flex items-center justify-between border border-white/5">
+                <div>
+                    <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-1">Vault Balance</p>
+                    <p class="text-2xl font-black text-neon-blue mono">₹{{ "{:,.2f}".format(user.balance) }}</p>
+                </div>
+                <div
+                    class="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-neon-blue">
+                    <i class="fas fa-vault"></i>
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-8">
+                <!-- Receiver URI -->
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Target
+                        Identity Hash</label>
+                    <div class="relative group">
+                        <span
+                            class="absolute inset-y-0 left-0 pl-6 flex items-center text-slate-600 transition-colors group-focus-within:text-neon-blue">
+                            <i class="fas fa-at"></i>
+                        </span>
+                        <input type="text" name="receiver_upi" placeholder="entity@sentinel" required
+                            class="w-full pl-14 pr-6 py-4 bg-black/20 border border-white/10 rounded-2xl outline-none focus:border-neon-blue transition-all text-white font-bold placeholder:text-slate-700">
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Delta
+                        Magnitude (₹)</label>
+                    <div class="relative group">
+                        <span
+                            class="absolute inset-y-0 left-0 pl-6 flex items-center text-slate-600 transition-colors group-focus-within:text-neon-blue">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </span>
+                        <input type="number" name="amount" placeholder="0.00" step="0.01" min="1" required
+                            class="w-full pl-14 pr-6 py-4 bg-black/20 border border-white/10 rounded-2xl outline-none focus:border-neon-blue transition-all text-white font-black text-xl mono placeholder:text-slate-700">
+                    </div>
+                    <p class="mt-3 text-[10px] text-slate-600 font-bold uppercase tracking-widest">Safety Threshold:
+                        ₹20,000</p>
+                </div>
+
+                <!-- Security Badge -->
+                <div
+                    class="flex items-center justify-center space-x-3 text-emerald-safe bg-emerald-safe/10 py-3 rounded-2xl border border-emerald-safe/20">
+                    <div class="w-1.5 h-1.5 bg-emerald-safe rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-black uppercase tracking-widest">RF-Core 2.0 Monitoring</span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-4 pt-4">
+                    <a href="/dashboard/{{ user.id }}"
+                        class="w-1/3 py-5 bg-white/5 border border-white/5 hover:bg-white/10 text-slate-400 font-black rounded-2xl transition-all text-xs uppercase tracking-widest text-center">
+                        CLOSE
+                    </a>
+                    <button type="button" onclick="showPinModal()"
+                        class="w-2/3 py-5 bg-neon-blue hover:bg-white text-obsidian font-black rounded-2xl shadow-[0_0_20px_rgba(0,242,255,0.3)] transition-all transform active:scale-[0.98] text-xs uppercase tracking-widest">
+                        EXECUTE DELTA
+                    </button>
+                    <input type="hidden" name="pin" id="final-pin">
+                </div>
+            </form>
+
+            <div class="mt-10 pt-6 border-t border-white/5 text-center">
+                <a href="/dashboard/{{ user.id }}"
+                    class="text-[10px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-home"></i> Return to Terminal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN ENTRY MODAL -->
+    <div id="pin-modal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center p-6 bg-obsidian/80 backdrop-blur-xl">
+        <div class="relative bg-coal rounded-[3.5rem] p-12 w-full max-w-sm shadow-3xl border border-white/10 scale-105">
+            <button type="button" onclick="hidePinModal()"
+                class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <div class="text-center mb-10">
+                <div
+                    class="w-16 h-16 bg-electric-indigo/10 text-electric-indigo border border-electric-indigo/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-fingerprint text-3xl"></i>
+                </div>
+                <h3 class="text-3xl font-black text-white tracking-tight">Auth Challege</h3>
+                <p class="text-slate-500 font-bold text-xs mt-2 uppercase tracking-widest">Decrypt Session Key</p>
+            </div>
+
+            <!-- PIN Dots -->
+            <div class="flex justify-center space-x-6 mb-12">
+                <div class="pin-dot" id="dot-0"></div>
+                <div class="pin-dot" id="dot-1"></div>
+                <div class="pin-dot" id="dot-2"></div>
+                <div class="pin-dot" id="dot-3"></div>
+            </div>
+
+            <!-- Numpad -->
+            <div class="grid grid-cols-3 gap-4 justify-items-center mb-4">
+                <button type="button" class="numpad-btn" onclick="appendPin('1')">1</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('2')">2</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('3')">3</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('4')">4</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('5')">5</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('6')">6</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('7')">7</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('8')">8</button>
+                <button type="button" class="numpad-btn" onclick="appendPin('9')">9</button>
+                <div class="w-16"></div>
+                <button type="button" class="numpad-btn" onclick="appendPin('0')">0</button>
+                <button type="button" class="numpad-btn text-cyber-rose bg-cyber-rose/5" onclick="clearPin()">
+                    <i class="fas fa-backspace"></i>
+                </button>
+            </div>
+
+            <div class="mt-8 text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">
+                Transaction Protected by AES-256 Mock
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPin = "";
+        const modal = document.getElementById('pin-modal');
+        const hiddenPinInput = document.getElementById('final-pin');
+        const form = document.querySelector('form');
+
+        function showPinModal() {
+            const amount = document.querySelector('input[name="amount"]').value;
+            const receiver = document.querySelector('input[name="receiver_upi"]').value;
+            if (!amount || !receiver) {
+                alert("Please synchronize amount and target identifier.");
+                return;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function hidePinModal() {
+            modal.classList.add('hidden');
+            clearPin();
+        }
+
+        function appendPin(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updateDots();
+                if (currentPin.length === 4) {
+                    setTimeout(submitTransaction, 300);
+                }
+            }
+        }
+
+        function clearPin() {
+            currentPin = "";
+            updateDots();
+        }
+
+        function updateDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) {
+                    if (i < currentPin.length) {
+                        dot.classList.add('filled');
+                    } else {
+                        dot.classList.remove('filled');
+                    }
+                }
+            }
+        }
+
+        function submitTransaction() {
+            hiddenPinInput.value = currentPin;
+            form.submit();
+        }
+    </script>
+</body>
+
+</html>

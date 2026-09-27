@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | UPI Fraud Detection System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'electric-indigo': '#6366f1',
+                        'cyber-rose': '#ff2d55',
+                        'emerald-safe': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen bg-obsidian text-slate-200">
+
+    <div class="flex">
+        <!-- Sidebar Desktop -->
+        <aside class="hidden lg:flex flex-col w-64 bg-coal h-screen sticky top-0 border-r border-white/5 glass">
+            <div class="p-8">
+                <div class="flex items-center space-x-3 mb-12">
+                    <div
+                        class="bg-gradient-to-br from-neon-blue to-electric-indigo p-2 rounded-xl shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+                        <i class="fas fa-shield-alt text-obsidian"></i>
+                    </div>
+                    <span class="text-xl font-black text-white tracking-tight">UPISentinel</span>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="/dashboard/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-th-large group-hover:text-neon-blue"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/transaction/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-paper-plane group-hover:text-electric-indigo"></i>
+                        <span>Send Money</span>
+                    </a>
+                    <a href="/history/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 bg-neon-blue/10 text-neon-blue rounded-2xl font-bold border border-neon-blue/20">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </a>
+                    <a href="/analysis/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-brain group-hover:text-electric-indigo"></i>
+                        <span>AI Analysis</span>
+                    </a>
+                    <a href="/settings/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-cog group-hover:text-neon-blue"></i>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mt-auto p-8">
+                <a href="/"
+                    class="flex items-center space-x-3 p-4 text-cyber-rose hover:bg-cyber-rose/5 rounded-2xl transition font-bold">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-12 max-w-6xl mx-auto overflow-hidden">
+            <header class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-8 relative">
+                <div
+                    class="absolute -top-20 -left-20 w-64 h-64 bg-neon-blue/5 rounded-full blur-[100px] pointer-events-none">
+                </div>
+                <div>
+                    <h1 class="text-3xl lg:text-4xl font-black text-white tracking-tight">Operation Ledger</h1>
+                    <p class="text-slate-500 font-bold mt-2 uppercase tracking-widest text-xs">Full Audit Trace of
+                        Secure Transactions</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button
+                        class="glass bg-white/5 px-6 py-3 border border-white/10 rounded-xl text-xs font-black text-slate-400 uppercase tracking-widest hover:text-white hover:border-white/20 transition-all">
+                        <i class="fas fa-download mr-2"></i> Export Trace
+                    </button>
+                </div>
+            </header>
+
+            <!-- Search and Filters -->
+            <div class="glass-card p-8 rounded-[2.5rem] border border-white/5 mb-12 bg-white/5">
+                <form method="GET" class="flex flex-col sm:flex-row gap-6">
+                    <div class="flex-1 relative">
+                        <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                        <input type="text" name="q" value="{{ q }}" placeholder="Scan for Entity or ID..."
+                            class="w-full pl-14 pr-6 py-4 bg-black/20 border border-white/10 rounded-[1.5rem] focus:outline-none focus:border-neon-blue transition-all font-bold text-white placeholder:text-slate-600">
+                    </div>
+                    <div class="flex gap-3">
+                        <select name="status" onchange="this.form.submit()"
+                            class="px-6 py-4 bg-black/20 border border-white/10 rounded-[1.5rem] text-xs font-black uppercase tracking-widest text-slate-400 focus:outline-none focus:border-neon-blue appearance-none min-w-[160px] cursor-pointer">
+                            <option {% if status=='All Status' %}selected{% endif %}>All Scopes</option>
+                            <option {% if status=='Success' %}selected{% endif %}>Success</option>
+                            <option {% if status=='Blocked' %}selected{% endif %}>Blocked</option>
+                            <option {% if status=='Suspicious' %}selected{% endif %}>Suspicious</option>
+                        </select>
+                        {% if q or status != 'All Status' %}
+                        <a href="/history/{{ user.id }}"
+                            class="px-6 py-4 bg-cyber-rose/10 text-cyber-rose border border-cyber-rose/20 rounded-[1.5rem] text-sm font-black flex items-center justify-center hover:bg-cyber-rose/20 transition-all">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-coal rounded-[3rem] border border-white/5 shadow-2xl overflow-hidden glass">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-black/40">
+                                <th class="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    Target Entity</th>
+                                <th class="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    Timestamp</th>
+                                <th class="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    Delta</th>
+                                <th class="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    Entropy</th>
+                                <th class="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    Integrity</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            {% for txn in transactions %}
+                            <tr class="hover:bg-white/5 transition group cursor-pointer"
+                                onclick="showTransactionDetails({{ txn.id }})">
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center">
+                                        {% if txn.sender_id == user.id %}
+                                        <div
+                                            class="w-12 h-12 bg-cyber-rose/10 border border-cyber-rose/20 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-arrow-up text-cyber-rose text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white mb-1">{{ txn.receiver_upi }}</p>
+                                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                                Egress Payload</p>
+                                        </div>
+                                        {% else %}
+                                        <div
+                                            class="w-12 h-12 bg-emerald-safe/10 border border-emerald-safe/20 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
+                                            <i class="fas fa-arrow-down text-emerald-safe text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-bold text-white mb-1">{{ txn.sender.name }}</p>
+                                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                                                Ingress Payload</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6 text-sm text-slate-400 font-bold mono uppercase">
+                                    {{ txn.timestamp.strftime('%d %b %Y • %H:%M') }}
+                                </td>
+                                <td
+                                    class="px-8 py-6 text-lg font-black mono {{ 'text-cyber-rose' if txn.sender_id == user.id else 'text-emerald-safe' }}">
+                                    {{ '-' if txn.sender_id == user.id else '+' }}₹{{ "{:,.2f}".format(txn.amount) }}
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="w-20 h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                                            <div class="h-full {{ 'bg-emerald-safe shadow-[0_0_10px_rgba(16,185,129,0.3)]' if txn.risk_score < 0.3 else 'bg-amber-500' if txn.risk_score < 0.7 else 'bg-cyber-rose shadow-[0_0_10px_rgba(255,45,85,0.3)]' }}"
+                                                style="width: {{ txn.risk_score * 100 }}%"></div>
+                                        </div>
+                                        <span class="text-[11px] font-black text-slate-500 mono">{{ txn.risk_score
+                                            }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span
+                                        class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest border {{ 'bg-emerald-safe/10 text-emerald-safe border-emerald-safe/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]' if txn.status == 'SUCCESS' else 'bg-cyber-rose/10 text-cyber-rose border-cyber-rose/20' if txn.status == 'BLOCKED' else 'bg-amber-500/10 text-amber-500 border-amber-500/20' }}">
+                                        {{ txn.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="py-24 text-center">
+                                    <div
+                                        class="bg-white/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
+                                        <i class="fas fa-database text-slate-600 text-3xl"></i>
+                                    </div>
+                                    <p class="text-slate-500 font-bold text-lg">Null Data Sector</p>
+                                    <p class="text-slate-600 text-sm mt-2">No transaction hashes identified within the
+                                        requested scope.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <div id="txn-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-obsidian/80 backdrop-blur-xl" onclick="closeTxnModal()"></div>
+        <div
+            class="relative bg-coal rounded-[3.5rem] p-10 max-w-lg w-full shadow-3xl border border-white/10 transform transition-all overflow-hidden glass-card">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon-blue to-electric-indigo"></div>
+
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h3 class="text-2xl font-black text-white tracking-tight">Operation Details</h3>
+                    <p class="text-slate-500 font-bold text-[10px] uppercase tracking-[0.2em] mt-1">Audit Trace ID:
+                        <span id="modal-txn-id" class="text-neon-blue mono">-</span></p>
+                </div>
+                <button onclick="closeTxnModal()" class="text-slate-500 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Status Badge -->
+                <div class="flex justify-center">
+                    <div id="modal-status"
+                        class="px-6 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.3em] border shadow-lg">
+                        -
+                    </div>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-black/20 p-5 rounded-3xl border border-white/5">
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Origin Entity</p>
+                        <p id="modal-sender-name" class="text-sm font-bold text-white mb-1">-</p>
+                        <p id="modal-sender-upi" class="text-[10px] text-neon-blue mono truncate">-</p>
+                    </div>
+                    <div class="bg-black/20 p-5 rounded-3xl border border-white/5">
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Target Entity</p>
+                        <p id="modal-receiver-name" class="text-sm font-bold text-white mb-1">-</p>
+                        <p id="modal-receiver-upi" class="text-[10px] text-electric-indigo mono truncate">-</p>
+                    </div>
+                </div>
+
+                <!-- Amount & Time -->
+                <div class="bg-black/20 p-6 rounded-3xl border border-white/5 flex items-center justify-between">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Delta Magnitude
+                        </p>
+                        <p id="modal-amount" class="text-2xl font-black text-white mono">₹0.00</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Temporal Stamp
+                        </p>
+                        <p id="modal-time" class="text-xs font-bold text-slate-400 mono uppercase">-</p>
+                    </div>
+                </div>
+
+                <!-- Risk Score -->
+                <div class="bg-black/20 p-6 rounded-3xl border border-white/5">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Integrity Entropy</p>
+                        <p id="modal-risk-text" class="text-[10px] font-black mono text-emerald-safe">0.05</p>
+                    </div>
+                    <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                        <div id="modal-risk-bar" class="h-full bg-emerald-safe shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                            style="width: 5%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10">
+                <button onclick="closeTxnModal()"
+                    class="w-full py-4 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white font-black rounded-2xl transition-all border border-white/5 text-[10px] uppercase tracking-widest">
+                    Terminate View
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function showTransactionDetails(txnId) {
+            const modal = document.getElementById('txn-modal');
+
+            try {
+                const response = await fetch(`/api/transaction/${txnId}`);
+                if (!response.ok) throw new Error('Query Failed');
+                const data = await response.json();
+
+                document.getElementById('modal-txn-id').innerText = data.id;
+                document.getElementById('modal-sender-name').innerText = data.sender_name;
+                document.getElementById('modal-sender-upi').innerText = data.sender_upi;
+                document.getElementById('modal-receiver-name').innerText = data.receiver_name;
+                document.getElementById('modal-receiver-upi').innerText = data.receiver_upi;
+                document.getElementById('modal-amount').innerText = `₹${data.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                document.getElementById('modal-time').innerText = data.timestamp;
+
+                // Status mapping
+                const statusEl = document.getElementById('modal-status');
+                statusEl.innerText = data.status;
+                statusEl.className = 'px-6 py-2 rounded-2xl text-xs font-black uppercase tracking-[0.3em] border shadow-lg ';
+
+                if (data.status === 'SUCCESS') {
+                    statusEl.classList.add('bg-emerald-safe/10', 'text-emerald-safe', 'border-emerald-safe/20');
+                } else if (data.status === 'BLOCKED') {
+                    statusEl.classList.add('bg-cyber-rose/10', 'text-cyber-rose', 'border-cyber-rose/20');
+                } else {
+                    statusEl.classList.add('bg-amber-500/10', 'text-amber-500', 'border-amber-500/20');
+                }
+
+                // Risk progress
+                const riskScore = data.risk_score;
+                const riskBar = document.getElementById('modal-risk-bar');
+                const riskText = document.getElementById('modal-risk-text');
+                riskText.innerText = riskScore.toFixed(2);
+                riskBar.style.width = `${riskScore * 100}%`;
+
+                riskBar.className = 'h-full transition-all duration-500 ';
+                if (riskScore < 0.3) {
+                    riskBar.classList.add('bg-emerald-safe', 'shadow-[0_0_10px_rgba(16,185,129,0.3)]');
+                    riskText.className = 'text-[10px] font-black mono text-emerald-safe';
+                } else if (riskScore < 0.7) {
+                    riskBar.classList.add('bg-amber-500');
+                    riskText.className = 'text-[10px] font-black mono text-amber-500';
+                } else {
+                    riskBar.classList.add('bg-cyber-rose', 'shadow-[0_0_10px_rgba(255,45,85,0.3)]');
+                    riskText.className = 'text-[10px] font-black mono text-cyber-rose';
+                }
+
+                modal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Audit Retrieval Error:', error);
+                alert('Connection to Audit API failed.');
+            }
+        }
+
+        function closeTxnModal() {
+            document.getElementById('txn-modal').classList.add('hidden');
+        }
+    </script>
+
+</body>
+
+</html>

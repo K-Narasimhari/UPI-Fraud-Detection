@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Blocked - Security Alert</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'cyber-rose': '#ff2d55',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6 bg-obsidian relative">
+
+    <!-- Red scan line background -->
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none scanning-grid bg-cyber-rose/5"></div>
+    <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyber-rose/10 rounded-full blur-[120px]"></div>
+
+    <div class="max-w-md w-full z-10 text-center">
+        <!-- Security Icon -->
+        <div
+            class="inline-flex items-center justify-center w-28 h-28 bg-cyber-rose rounded-3xl mb-10 shadow-[0_0_30px_rgba(255,45,85,0.4)] relative group">
+            <i class="fas fa-shield-alt text-white text-5xl transition-transform group-hover:scale-110"></i>
+            <div class="absolute -inset-4 border-2 border-cyber-rose/20 rounded-[2.5rem] animate-pulse"></div>
+        </div>
+
+        <h1 class="text-4xl font-black text-white tracking-tight mb-3">DELTA BLOCKED</h1>
+        <p class="text-cyber-rose font-black uppercase tracking-[0.3em] text-xs mb-10">Neural Threat Mitigation Active
+        </p>
+
+        <!-- Details Card -->
+        <div
+            class="glass-card p-10 rounded-[3rem] shadow-3xl border border-white/5 text-left bg-white/5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-cyber-rose"></div>
+
+            <div class="flex items-center gap-6 mb-8 pb-8 border-b border-white/5">
+                <div
+                    class="w-14 h-14 bg-cyber-rose/10 border border-cyber-rose/20 rounded-2xl flex items-center justify-center text-cyber-rose">
+                    <i class="fas fa-indian-rupee-sign text-2xl"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Impact Magnitude</p>
+                    <p class="text-3xl font-black text-white mono tracking-tight">₹{{ "{:,.2f}".format(amount) }}</p>
+                </div>
+            </div>
+
+            <div class="space-y-6 mb-10">
+                <div class="flex justify-between items-center group">
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Target Identity</span>
+                    <span class="text-sm font-bold text-white tracking-wide">{{ receiver }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Inference
+                        Trigger</span>
+                    <span class="text-sm font-black text-cyber-rose uppercase tracking-widest">Threshold
+                        Violation</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sentinel Policy</span>
+                    <span class="text-sm font-bold text-white mono">MAX_Txn_20K</span>
+                </div>
+            </div>
+
+            {% if risk_reason %}
+            <div class="p-6 bg-cyber-rose/10 rounded-[2rem] border border-cyber-rose/30 mb-10 relative overflow-hidden">
+                <div class="flex gap-4">
+                    <i class="fas fa-brain text-cyber-rose mt-1"></i>
+                    <div>
+                        <p class="text-[10px] font-black text-cyber-rose uppercase tracking-widest mb-2">AI Security
+                            Insight</p>
+                        <p class="text-[12px] text-white leading-relaxed font-bold tracking-wide">
+                            {{ risk_reason }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="p-6 bg-orange-500/5 rounded-[2rem] border border-orange-500/20 mb-10 relative overflow-hidden">
+                <div class="flex gap-4">
+                    <i class="fas fa-info-circle text-orange-500 mt-1"></i>
+                    <p class="text-[11px] text-slate-400 leading-relaxed font-bold uppercase tracking-wider">
+                        Operation halted by RF-Core to preserve account integrity. Secure alert dispatched to linked hub
+                        for audit.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-4">
+                <a href="/dashboard/{{ user_id }}"
+                    class="w-full py-5 bg-white text-obsidian font-black rounded-2xl transition-all transform hover:scale-[1.02] shadow-2xl text-xs uppercase tracking-widest text-center">
+                    Return to Terminal
+                </a>
+                <a href="javascript:history.back()"
+                    class="w-full py-5 bg-white/5 border border-white/5 hover:bg-white/10 text-slate-400 font-black rounded-2xl transition-all text-xs uppercase tracking-widest text-center">
+                    Modify Delta
+                </a>
+            </div>
+        </div>
+
+        <p
+            class="mt-12 text-slate-600 font-black text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3">
+            <span class="w-1 h-1 bg-cyber-rose rounded-full animate-ping"></span>
+            Operational Monitoring Active
+        </p>
+    </div>
+
+    <script>
+        // Audio Trigger
+        window.addEventListener('mousedown', () => sentinelAudio.init(), { once: true });
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                sentinelAudio.playBlocked();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

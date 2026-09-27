@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Verified | UPI Fraud Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'electric-indigo': '#6366f1',
+                        'emerald-safe': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen bg-emerald-safe flex flex-col items-center justify-center p-6 relative">
+    <!-- Pulse backdrop -->
+    <div class="absolute inset-0 z-0 bg-emerald-safe-glow animate-pulse opacity-50"></div>
+
+    <div class="max-w-xl w-full z-10 text-center py-12">
+        <h1 class="text-xs font-black text-white/60 mb-12 uppercase tracking-[0.4em]">UPI Sentinel | Integrity Verified
+        </h1>
+
+        <div class="mb-6">
+            <p class="text-white/80 font-bold uppercase tracking-widest text-sm mb-2">Delta Transferred To</p>
+            <h2 class="text-3xl font-black text-white tracking-tight">{{ receiver }}</h2>
+        </div>
+
+        <div class="text-white font-black text-6xl md:text-8xl mb-12 tracking-tighter">
+            ₹{{ amount }}
+        </div>
+
+        <div class="relative w-24 h-24 mx-auto mb-12 flex items-center justify-center">
+            <div class="absolute inset-0 bg-white/20 rounded-full animate-ping opacity-30"></div>
+            <div class="relative w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl">
+                <i class="fas fa-check text-emerald-safe text-3xl"></i>
+            </div>
+        </div>
+
+        <p class="text-white font-black uppercase tracking-[0.2em] text-xs mb-10 pulse-glow">Operation Synchronized
+            Successfully ⚡</p>
+
+        <div
+            class="glass w-full max-w-sm mx-auto p-8 rounded-[2.5rem] border-white/20 text-left bg-white/10 shadow-3xl text-white">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                <span class="text-[10px] font-black uppercase opacity-60">Timestamp</span>
+                <span class="text-sm font-bold mono" id="current-date"></span>
+            </div>
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                <span class="text-[10px] font-black uppercase opacity-60">Status</span>
+                <span class="text-sm font-black">HASH_VERIFIED</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-[10px] font-black uppercase opacity-60">Network</span>
+                <span class="text-sm font-bold uppercase tracking-widest">Sentinel Core</span>
+            </div>
+        </div>
+
+        {% if last_features %}
+        <div
+            class="w-full max-w-sm mx-auto p-8 rounded-[2.5rem] border border-obsidian/10 mt-6 text-left bg-obsidian/20 text-white backdrop-blur-md">
+            <p class="text-[10px] font-black text-neon-blue uppercase tracking-widest mb-4 flex items-center gap-2">
+                <i class="fas fa-microchip"></i> Behavioral Heuristics
+            </p>
+            <div class="grid grid-cols-2 gap-y-4 gap-x-6 mb-6">
+                <div>
+                    <p class="text-[9px] font-black opacity-50 uppercase tracking-widest mb-0.5">Velocity</p>
+                    <p class="text-sm font-bold mono">{{ last_features.velocity }}s</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black opacity-50 uppercase tracking-widest mb-0.5">Luminosity</p>
+                    <p class="text-sm font-bold">{{ 'Dark' if last_features.is_night else 'Standard' }}</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black opacity-50 uppercase tracking-widest mb-0.5">Cycle</p>
+                    <p class="text-sm font-bold">{{ last_features.hour }}:00</p>
+                </div>
+                <div>
+                    <p class="text-[9px] font-black opacity-50 uppercase tracking-widest mb-0.5">Epoch</p>
+                    <p class="text-sm font-bold">{{
+                        ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][last_features.day_of_week] }}</p>
+                </div>
+            </div>
+
+            {% if risk_reason %}
+            <div class="pt-4 border-t border-white/5">
+                <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-2">Security Insights</p>
+                <p class="text-[11px] font-medium text-white/80 leading-relaxed">{{ risk_reason }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="flex gap-4 w-full max-w-sm mx-auto mt-12">
+            <a href="/dashboard/{{ user_id }}"
+                class="flex-1 py-5 bg-white text-emerald-safe font-black rounded-2xl shadow-2xl transition-all transform hover:scale-105 uppercase tracking-widest text-xs">
+                Go Home
+            </a>
+            <a href="javascript:history.back()"
+                class="flex-1 py-5 bg-white/10 border border-white/20 text-white font-black rounded-2xl transition-all transform hover:scale-105 uppercase tracking-widest text-xs">
+                Return
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const options = { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-IN', options);
+
+        // Audio Trigger
+        window.addEventListener('mousedown', () => sentinelAudio.init(), { once: true });
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                sentinelAudio.playSuccess();
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

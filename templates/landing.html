@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Fraud Detection and Real-time Alert System</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'electric-indigo': '#6366f1',
+                        'cyber-rose': '#ff2d55',
+                        'emerald-safe': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-obsidian text-slate-200">
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between h-20 items-center">
+
+                <!-- PROJECT NAME -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-br from-neon-blue to-electric-indigo p-2.5 rounded-xl shadow-[0_0_15px_rgba(0,242,255,0.3)]">
+                        <i class="fas fa-shield-halved text-obsidian text-xl"></i>
+                    </div>
+                    <span class="text-lg md:text-2xl font-extrabold tracking-tight text-white">
+                        UPI <span class="text-neon-blue">Fraud Detection</span>
+                    </span>
+                </div>
+
+                <!-- MENU -->
+                <div class="hidden md:flex space-x-10 font-semibold text-slate-400">
+                    <a href="#how-it-works" class="hover:text-neon-blue transition-colors">How it Works</a>
+                    <a href="#features" class="hover:text-neon-blue transition-colors">Safety Features</a>
+                    <a href="#analysis" class="hover:text-neon-blue transition-colors">AI Analysis</a>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="flex items-center space-x-4">
+                    <a href="/login"
+                        class="hidden sm:block px-6 py-2.5 font-bold text-neon-blue hover:text-white transition-colors">
+                        Portal
+                    </a>
+                    <a href="/register"
+                        class="px-6 py-2.5 bg-neon-blue text-obsidian font-bold rounded-xl hover:bg-white transition-all shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+                        Get Secure
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="relative pt-48 pb-32 overflow-hidden">
+        <!-- Background Circuit Effect -->
+        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366f1" stroke-width="0.5" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-electric-indigo/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-neon-blue/10 rounded-full blur-[120px]"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <span class="inline-block mb-6 px-4 py-1.5 bg-electric-indigo/10 text-electric-indigo border border-electric-indigo/20 font-bold rounded-full text-xs uppercase tracking-widest">
+                    Academic Simulation • AI Powered
+                </span>
+
+                <h1 class="text-6xl lg:text-7xl font-black leading-tight text-white mb-8">
+                    Smart UPI <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-electric-indigo">Sentinel Shield</span>
+                </h1>
+
+                <p class="text-xl text-slate-400 max-w-xl leading-relaxed mb-10">
+                    A high-fidelity simulation and real-time behavioral monitoring system designed to detect and block fraudulent UPI transactions before they happen.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-5">
+                    <a href="/login"
+                        class="px-10 py-4 bg-neon-blue text-obsidian font-black rounded-2xl hover:bg-white transition-all shadow-[0_0_20px_rgba(0,242,255,0.3)] text-center">
+                        LAUNCH DEMO
+                    </a>
+                    <a href="/register"
+                        class="px-10 py-4 border border-white/10 glass text-white font-bold rounded-2xl hover:bg-white/5 transition-all text-center">
+                        CREATE SECURITY ID
+                    </a>
+                </div>
+            </div>
+
+            <!-- DYNAMIC PHONE MOCK -->
+            <div class="flex justify-center">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-neon-blue to-electric-indigo rounded-[3.5rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative bg-coal p-4 rounded-[3.5rem] border border-white/10 shadow-2xl w-[320px] aspect-[9/18.5] overflow-hidden scanning-grid">
+                        <!-- Top Notch -->
+                        <div class="mx-auto w-24 h-6 bg-obsidian rounded-b-2xl mb-8"></div>
+                        
+                        <!-- Screen Content -->
+                        <div class="p-4 flex flex-col items-center justify-center h-[80%] text-center">
+                            <div class="w-20 h-20 bg-cyber-rose/10 border border-cyber-rose/20 rounded-full flex items-center justify-center mb-6 pulse-glow">
+                                <i class="fas fa-biohazard text-cyber-rose text-3xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-2">THREAT DETECTED</h3>
+                            <p class="text-slate-500 text-sm mb-8">Unauthorized transaction pattern identified via Random Forest Core.</p>
+                            
+                            <div class="w-full space-y-3">
+                                <div class="p-3 bg-white/5 border border-white/10 rounded-2xl text-left">
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold">Risk Score</p>
+                                    <p class="text-lg font-bold text-cyber-rose">0.92 / 1.00</p>
+                                </div>
+                                <button class="w-full py-4 bg-cyber-rose text-white font-black rounded-2xl shadow-[0_0_15px_rgba(255,45,85,0.4)]">
+                                    BLOCK TRANSACTION
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="py-32 bg-coal/50 relative border-y border-white/5">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-black text-white mb-4">The Detection Engine</h2>
+                <div class="w-24 h-1.5 bg-neon-blue mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] hover:border-neon-blue/30 transition-all group">
+                    <div class="w-16 h-16 bg-neon-blue/10 rounded-2xl flex items-center justify-center mb-8 border border-neon-blue/20 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-fingerprint text-3xl text-neon-blue"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl text-white mb-4">Inference Intake</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        User initiates a simulated UPI transaction. Our intake engine captures behavioral features including amount, time, and location.
+                    </p>
+                </div>
+
+                <div class="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] hover:border-electric-indigo/30 transition-all group">
+                    <div class="w-16 h-16 bg-electric-indigo/10 rounded-2xl flex items-center justify-center mb-8 border border-electric-indigo/20 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-microchip text-3xl text-electric-indigo"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl text-white mb-4">Random Forest Analysis</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Risk evaluation via a pre-trained ML classifier. The system analyzes features across multiple decision trees to produce a risk score.
+                    </p>
+                </div>
+
+                <div class="bg-white/5 border border-white/10 p-10 rounded-[2.5rem] hover:border-cyber-rose/30 transition-all group">
+                    <div class="w-16 h-16 bg-cyber-rose/10 rounded-2xl flex items-center justify-center mb-8 border border-cyber-rose/20 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-shield-virus text-3xl text-cyber-rose"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl text-white mb-4">Defensive Response</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Instant blocking of suspicious activity. Real-time alerts are dispatched across the platform to secure funds immediately.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE SAFETY INFRASTRUCTURE -->
+    <section id="features" class="py-32 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                <div class="lg:w-1/2 space-y-8">
+                    <div>
+                        <span class="text-neon-blue font-bold uppercase tracking-widest text-xs">Security protocols</span>
+                        <h2 class="text-5xl font-black text-white mt-4 mb-8">Multi-Layered <br>Defense Perimeter</h2>
+                    </div>
+
+                    <div class="grid gap-6">
+                        <div class="flex gap-6 p-6 glass-card rounded-3xl hover:bg-white/5 transition duration-300">
+                            <div class="flex-shrink-0 w-14 h-14 bg-neon-blue/10 text-neon-blue rounded-2xl flex items-center justify-center border border-neon-blue/20">
+                                <i class="fas fa-lock text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-2">Secure PIN Authorization</h3>
+                                <p class="text-slate-400 text-sm">Mandatory 4-digit verification for all outgoing transfers ensuring session ownership.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-6 p-6 glass-card rounded-3xl hover:bg-white/5 transition duration-300">
+                            <div class="flex-shrink-0 w-14 h-14 bg-electric-indigo/10 text-electric-indigo rounded-2xl flex items-center justify-center border border-electric-indigo/20">
+                                <i class="fas fa-bolt text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-2">Velocity Rate Limiting</h3>
+                                <p class="text-slate-400 text-sm">Automated detection of rapid-fire transaction patterns to prevent draining attacks.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-6 p-6 glass-card rounded-3xl hover:bg-white/5 transition duration-300">
+                            <div class="flex-shrink-0 w-14 h-14 bg-cyber-rose/10 text-cyber-rose rounded-2xl flex items-center justify-center border border-cyber-rose/20">
+                                <i class="fas fa-gauge-high text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-2">Safety Threshold Guards</h3>
+                                <p class="text-slate-400 text-sm">Automatic flagging of high-value transactions (₹20,000+) for secondary verification.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 relative">
+                    <div class="absolute inset-0 bg-electric-indigo/30 blur-[120px] rounded-full"></div>
+                    <div class="relative bg-coal rounded-[3rem] p-10 shadow-3xl border border-white/10 glass">
+                        <div class="flex items-center justify-between mb-10">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-shield-check text-neon-blue"></i>
+                                <span class="text-white font-black text-sm uppercase tracking-[0.2em]">Operational Shield</span>
+                            </div>
+                            <div class="flex space-x-1">
+                                <div class="w-1.5 h-1.5 bg-emerald-safe rounded-full animate-pulse"></div>
+                                <div class="w-1.5 h-1.5 bg-emerald-safe/50 rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-emerald-safe/30 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-8">
+                            <div class="relative">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-slate-400 text-xs font-bold uppercase">PIN Auth Layer</span>
+                                    <span class="text-emerald-safe text-xs font-black">SECURE</span>
+                                </div>
+                                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-neon-blue" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-slate-400 text-xs font-bold uppercase">ML Inference Core</span>
+                                    <span class="text-emerald-safe text-xs font-black">SCANNING</span>
+                                </div>
+                                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-electric-indigo animate-[progress_2s_infinite]" style="width: 65%"></div>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-slate-400 text-xs font-bold uppercase">Vault Threshold</span>
+                                    <span class="text-emerald-safe text-xs font-black">ACTIVE</span>
+                                </div>
+                                <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full bg-cyber-rose" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-obsidian border-t border-white/5 py-16 text-center">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-center space-x-3 mb-8">
+                <div class="bg-white/5 p-2 rounded-lg">
+                    <i class="fas fa-shield-alt text-neon-blue"></i>
+                </div>
+                <span class="text-xl font-black text-white">UPISentinel AI</span>
+            </div>
+            <p class="text-slate-500 text-sm mb-2">© 2024 UPI Fraud Detection And Real Time Alert System</p>
+            <p class="text-slate-600 text-[10px] font-bold uppercase tracking-widest">Academic Mini Project – High Fidelity Simulation</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

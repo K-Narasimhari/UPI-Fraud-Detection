@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis | UPI Fraud Detection System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#0a0a0c',
+                        coal: '#121216',
+                        'neon-blue': '#00f2ff',
+                        'electric-indigo': '#6366f1',
+                        'cyber-rose': '#ff2d55',
+                        'emerald-safe': '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen bg-obsidian text-slate-200">
+
+    <div class="flex">
+        <!-- Sidebar Desktop -->
+        <aside class="hidden lg:flex flex-col w-64 bg-coal h-screen sticky top-0 border-r border-white/5 glass">
+            <div class="p-8">
+                <div class="flex items-center space-x-3 mb-12">
+                    <div
+                        class="bg-gradient-to-br from-neon-blue to-electric-indigo p-2 rounded-xl shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+                        <i class="fas fa-shield-alt text-obsidian"></i>
+                    </div>
+                    <span class="text-xl font-black text-white tracking-tight">UPISentinel</span>
+                </div>
+
+                <nav class="space-y-2">
+                    <a href="/dashboard/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-th-large group-hover:text-neon-blue"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/transaction/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-paper-plane group-hover:text-electric-indigo"></i>
+                        <span>Send Money</span>
+                    </a>
+                    <a href="/history/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-history group-hover:text-neon-blue"></i>
+                        <span>History</span>
+                    </a>
+                    <a href="/analysis/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 bg-neon-blue/10 text-neon-blue rounded-2xl font-bold border border-neon-blue/20">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Analysis</span>
+                    </a>
+                    <a href="/settings/{{ user.id }}"
+                        class="flex items-center space-x-3 p-4 text-slate-500 hover:bg-white/5 hover:text-white rounded-2xl transition font-bold group">
+                        <i class="fas fa-cog group-hover:text-neon-blue"></i>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mt-auto p-8">
+                <a href="/"
+                    class="flex items-center space-x-3 p-4 text-cyber-rose hover:bg-cyber-rose/5 rounded-2xl transition font-bold">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-12 max-w-6xl mx-auto overflow-hidden">
+            <header class="mb-12 relative">
+                <div
+                    class="absolute -top-20 -left-20 w-64 h-64 bg-electric-indigo/5 rounded-full blur-[100px] pointer-events-none">
+                </div>
+                <h1 class="text-3xl lg:text-4xl font-black text-white tracking-tight">Heuristic Security Analysis</h1>
+                <p class="text-slate-500 font-bold mt-2 uppercase tracking-widest text-xs">Real-time behavioral
+                    profiling core</p>
+            </header>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <!-- Security Score -->
+                <div
+                    class="glass-card p-10 rounded-[3rem] border border-white/5 text-center flex flex-col items-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-neon-blue/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <h3 class="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-10">Client Integrity
+                        Score</h3>
+
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                        <!-- Dynamic Circle SVG -->
+                        <svg class="w-full h-full -rotate-90">
+                            <circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="8" fill="transparent"
+                                class="text-white/5" />
+                            <circle cx="80" cy="80" r="70" stroke="currentColor" stroke-width="8" fill="transparent"
+                                stroke-dasharray="440" stroke-dashoffset="{{ 440 - (440 * security_score) / 100 }}"
+                                class="text-neon-blue shadow-[0_0_15px_rgba(0,242,255,0.5)] transition-all duration-1000 ease-out" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="text-5xl font-black text-white mono">{{ security_score }}</span>
+                            <span class="text-[10px] text-neon-blue font-black uppercase tracking-widest mt-1">Safe
+                                Delta</span>
+                        </div>
+                    </div>
+
+                    <p class="mt-10 text-xs text-slate-500 leading-relaxed font-bold">
+                        Calculated based on amount volatility, temporal frequency, and transaction entropy.
+                    </p>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="lg:col-span-2 grid sm:grid-cols-2 gap-8">
+                    <div class="glass-card p-8 rounded-[2.5rem] border border-white/5 group bg-white/5">
+                        <div
+                            class="w-14 h-14 bg-neon-blue/10 text-neon-blue rounded-2xl flex items-center justify-center mb-6 border border-neon-blue/20 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-microchip text-2xl"></i>
+                        </div>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Machine
+                            Learning System</p>
+                        <h4 class="text-2xl font-black text-white tracking-tight">RF-v2.0 Sentinel <span
+                                class="text-emerald-safe ml-2 text-xs">ONLINE</span></h4>
+                        <p
+                            class="text-xs text-neon-blue font-bold mt-4 uppercase tracking-widest bg-neon-blue/5 inline-block px-3 py-1 rounded-lg">
+                            Continuous Monitoring Active</p>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-[2.5rem] border border-white/5 group bg-white/5">
+                        <div
+                            class="w-14 h-14 bg-cyber-rose/10 text-cyber-rose rounded-2xl flex items-center justify-center mb-6 border border-cyber-rose/20 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-brain text-2xl"></i>
+                        </div>
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">Threat
+                            Mitigation</p>
+                        <h4 class="text-2xl font-black text-white tracking-tight">{{ blocked_count }} Anomalies Blocked
+                        </h4>
+                        <p
+                            class="text-xs text-cyber-rose font-bold mt-4 uppercase tracking-widest bg-cyber-rose/5 inline-block px-3 py-1 rounded-lg">
+                            {{ suspicious_count }} Suspicious Heuristics</p>
+                    </div>
+
+                    <div
+                        class="sm:col-span-2 glass-card p-8 rounded-[2.5rem] border border-white/5 bg-coal relative overflow-hidden scanning-grid">
+                        <div class="relative z-10">
+                            <h4 class="font-black flex items-center gap-3 mb-3 text-white">
+                                <i class="fas fa-bolt-lightning text-electric-indigo text-lg"></i>
+                                REAL-TIME INFERENCE LATENCY
+                            </h4>
+                            <p class="text-slate-500 text-sm leading-relaxed max-w-xl font-bold">
+                                Behavioral AI processes all incoming transaction metadata in <span
+                                    class="text-white font-black">~45ms</span> per operation via concurrent forest
+                                traversal.
+                            </p>
+                        </div>
+                        <i
+                            class="fas fa-brain absolute right-[-20px] bottom-[-20px] text-9xl text-white/5 rotate-12"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last AI Prediction Details -->
+            {% if last_features %}
+            <div
+                class="bg-coal rounded-[3rem] border border-white/5 shadow-2xl p-10 mb-12 relative overflow-hidden glass-card">
+                <div class="absolute top-0 right-0 p-10 opacity-5">
+                    <i class="fas fa-code text-7xl text-white"></i>
+                </div>
+                <div class="relative z-10">
+                    <div class="flex items-center gap-4 mb-10">
+                        <div class="bg-gradient-to-br from-electric-indigo to-neon-blue p-3 rounded-xl shadow-lg">
+                            <i class="fas fa-magnifying-glass-chart text-obsidian"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-white tracking-tight uppercase tracking-wider">Last Ingested
+                            Feature Set</h3>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                        <div
+                            class="p-6 bg-black/20 rounded-2xl border border-white/5 hover:border-neon-blue/30 transition-colors">
+                            <p class="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">Amount Delta
+                            </p>
+                            <p class="text-xl font-black text-white mono">₹{{ last_features.amount }}</p>
+                        </div>
+                        <div
+                            class="p-6 bg-black/20 rounded-2xl border border-white/5 hover:border-neon-blue/30 transition-colors">
+                            <p class="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">Ingest Hour
+                            </p>
+                            <p class="text-xl font-black text-white mono">{{ last_features.hour }}:00</p>
+                        </div>
+                        <div
+                            class="p-6 bg-black/20 rounded-2xl border border-white/5 hover:border-neon-blue/30 transition-colors">
+                            <p class="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">Heuristic
+                                Day</p>
+                            <p class="text-xl font-black text-white mono">{{
+                                ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][last_features.day_of_week] }}</p>
+                        </div>
+                        <div
+                            class="p-6 bg-black/20 rounded-2xl border border-white/5 hover:border-neon-blue/30 transition-colors">
+                            <p class="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">Velocity (s)
+                            </p>
+                            <p class="text-xl font-black text-white mono">{{ last_features.velocity }}s</p>
+                        </div>
+                        <div
+                            class="p-6 bg-black/20 rounded-2xl border border-white/5 hover:border-neon-blue/30 transition-colors">
+                            <p class="text-[10px] text-slate-500 font-black uppercase mb-2 tracking-widest">Night Mode
+                            </p>
+                            <p
+                                class="text-xl font-black text-{{ 'rose-400' if last_features.is_night else 'emerald-400' }} mono">
+                                {{ 'TRUE' if last_features.is_night else 'FALSE' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if risk_reason %}
+                    <div class="p-6 bg-white/5 rounded-3xl border border-white/10 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-neon-blue"></div>
+                        <h4 class="text-[10px] font-black text-neon-blue uppercase tracking-[0.2em] mb-3">AI Security
+                            Interpretation</h4>
+                        <p class="text-sm font-bold text-white leading-relaxed tracking-wide">
+                            {{ risk_reason }}
+                        </p>
+                    </div>
+                    {% endif %}
+                    <p class="mt-8 text-xs text-slate-600 font-bold italic">
+                        * Exact scalar values utilized for algorithmic inference within the Random Forest core.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Protection Rules -->
+            <div class="bg-coal rounded-[3rem] border border-white/5 shadow-2xl p-10 glass-card">
+                <h3 class="text-xl font-black text-white mb-10 tracking-tight flex items-center gap-3">
+                    <i class="fas fa-shield-check text-neon-blue"></i>
+                    ACTIVE DEFENSIVE PROTOCOLS
+                </h3>
+
+                <div class="space-y-8">
+                    <div class="flex items-start gap-6 group">
+                        <div
+                            class="w-12 h-12 bg-white/5 text-neon-blue rounded-xl flex items-center justify-center flex-shrink-0 border border-white/5 group-hover:border-neon-blue/30 transition-colors">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-black text-white tracking-wide">Multi-Tree Ensemble Modeling</h4>
+                                <span
+                                    class="px-3 py-1 bg-neon-blue/10 text-neon-blue text-[10px] font-black rounded-lg uppercase tracking-widest">Advanced
+                                    Core</span>
+                            </div>
+                            <p class="text-sm text-slate-500 font-bold leading-relaxed">System trains on 10,000+
+                                historical fraud signatures. Evaluates spatial amount deviation and temporal frequency
+                                spikes.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-6 group">
+                        <div
+                            class="w-12 h-12 bg-white/5 text-electric-indigo rounded-xl flex items-center justify-center flex-shrink-0 border border-white/5 group-hover:border-electric-indigo/30 transition-colors">
+                            <i class="fas fa-ruler-vertical"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-black text-white tracking-wide">Hard-Cap Threshold Invariant</h4>
+                                <span
+                                    class="px-3 py-1 bg-electric-indigo/10 text-electric-indigo text-[10px] font-black rounded-lg uppercase tracking-widest">Enforced</span>
+                            </div>
+                            <p class="text-sm text-slate-500 font-bold leading-relaxed">Atomic blocking of all
+                                high-volatility operations (₹20k+) to mitigate large-scale unauthorized delta shifts.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-6 group">
+                        <div
+                            class="w-12 h-12 bg-white/5 text-cyber-rose rounded-xl flex items-center justify-center flex-shrink-0 border border-white/5 group-hover:border-cyber-rose/30 transition-colors">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="font-black text-white tracking-wide">Identity Checksum (PIN)</h4>
+                                <span
+                                    class="px-3 py-1 bg-cyber-rose/10 text-cyber-rose text-[10px] font-black rounded-lg uppercase tracking-widest">Mandatory</span>
+                            </div>
+                            <p class="text-sm text-slate-500 font-bold leading-relaxed">Secondary authentication layer
+                                via encrypted PIN challenge to ensure authorized session continuity.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>
